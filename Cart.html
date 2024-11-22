@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart</title>
+  <script src="https://kit.fontawesome.com/1e086755ed.js" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .cart-items {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .cart-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .cart-item-image {
+      width: 100px;
+      height: auto;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .cart-item-details {
+      flex: 1;
+      padding-left: 10px;
+    }
+    .cart-item-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .cart-item-controls-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cart-item-controls button {
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      background-color: #f8f9fa;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .cart-item-controls span {
+      width: 40px;
+      text-align: center;
+      display: inline-block;
+    }
+    .footer-btn {
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .footer-btn:hover {
+      background-color: #333;
+    }
+    .order-summary {
+      border-radius: 5px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+    }
+    .empty-cart {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .empty-cart a {
+      text-decoration: none;
+    }
+    h4 {
+      background-color: gainsboro;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .order-summary-table td, .order-summary-table th {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light py-3">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <h2 class="mb-0">Ecommerce</h2>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link text-dark" href="Home.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="Products.html">Products</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="About.html">About</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="Contact.html">Contact</a></li>
+        </ul>
+        <a href="Login.html" class="btn btn-outline-dark btn-sm">
+          <i class="fa-solid fa-right-to-bracket me-2"></i> Login
+        </a>
+        <a href="Register.html" class="btn btn-outline-dark btn-sm">
+          <i class="fas fa-user-plus me-2"></i> Register
+        </a>
+        <a href="Cart.html" class="btn btn-outline-dark btn-sm">
+          <i class="fa-solid fa-cart-shopping me-2"></i> Cart (<span id="cart-value">0</span>)
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-lg-8 col-md-12 p-3" id='cart-empty' style="background-color: #f8f9fa; border-radius: 5px; border: 1px solid #ddd;">
+        <h4>Item List</h4>
+        <div id="cart-items" class="cart-items"></div>
+      </div>
+      <div class="col-lg-4 col-md-12 p-3 mt-3">
+        <div id="order-summary" class="order-summary" style="display: none;">
+          <h4>Order Summary</h4>
+          <table class="order-summary-table w-100">
+            <tr>
+              <th>Product(<span id="product-value"></span>)</th>
+              <td><span id="product-amount"></span></td>
+            </tr>
+            <tr>
+              <th>Shipping</th>
+              <td><span id="shipping-amount"></span></td>
+            </tr>
+            <tr>
+              <th>Total Amount</th>
+              <td><span id="total-amount"></span></td>
+            </tr>
+          </table>
+          <button class="footer-btn">Go to Checkout</button>
+        </div>
+        <div id="empty" style="display: none;transform:translateX(20px);background-color: whitesmoke;width:900px;height:300px;align-content: center;" align="center">
+          <h3>Your Cart</h3>
+          <h1>Your Cart is Empty</h1>
+          <a href="Products.html" class="btn btn-outline-dark">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function loadCart() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let cartItemsDiv = document.getElementById('cart-items');
+      let empty = document.getElementById('empty');
+      let orderSummary = document.getElementById('order-summary');
+      let productAmount = document.getElementById('product-amount');
+      let productvalue = document.getElementById('product-value');
+      let shippingAmount = document.getElementById('shipping-amount');
+      let totalAmount = document.getElementById('total-amount');
+      cartItemsDiv.innerHTML = '';
+      if (cart.length === 0) {
+        document.getElementById('cart-empty').style.display = 'none';
+        empty.style.display = 'block';
+        orderSummary.style.display = 'none';
+        document.getElementById('cart-value').innerText = '0'; 
+        return;
+      } else {
+        empty.style.display = 'none';
+        orderSummary.style.display = 'block';
+      }
+      let total = 0;
+      cart.forEach(item => {
+        cartItemsDiv.innerHTML += `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+            <div class="cart-item-details">
+              <p><strong>${item.title}</strong></p>
+            </div>
+            <div class="cart-item-controls">
+              <div class="cart-item-controls-buttons">
+                <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span>${item.quantity}</span>
+                <button onclick="updateQuantity(${item.id}, 1)">+</button>
+              </div>
+              <p>${item.quantity} x $${item.price.toFixed(2)}</p>
+            </div>
+          </div>
+        `;
+        productvalue.textContent =cart.reduce((acc, item) => acc + item.quantity, 0);
+        total += item.quantity * item.price;
+      });
+      const shippingCost = 30;
+      const grandTotal = total + shippingCost;
+      productAmount.textContent = `$${total.toFixed(2)}`;
+      shippingAmount.textContent = `$${shippingCost}`;
+      totalAmount.textContent = `$${grandTotal.toFixed(2)}`;
+      updateCartValue();
+    }
+    function updateQuantity(id, delta) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let item = cart.find(item => item.id === id);
+      if (item) {
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+          removeFromCart(id);
+        } else {
+          localStorage.setItem('cart', JSON.stringify(cart));
+          loadCart();
+          updateCartValue();
+        }
+      }
+    }
+    function removeFromCart(id) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart = cart.filter(item => item.id !== id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+    function updateCartValue() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let cartValue = cart.reduce((acc, item) => acc + item.quantity, 0);
+      document.getElementById('cart-value').innerText = cartValue;
+    }
+    document.addEventListener('DOMContentLoaded', loadCart);
+  </script>
+</body>
+</html>

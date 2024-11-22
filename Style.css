@@ -1,0 +1,22 @@
+#cartCount {
+    font-size: 0.75rem; 
+    padding: 0.2em 0.4em; 
+    border-radius: 50%; 
+    min-width: 20px; 
+    text-align: center;
+    line-height: 1.2; 
+    color: white;
+    z-index: 10; 
+}
+.navbar .btn-outline-success {
+    position: relative; 
+    padding-right: 2.5rem; 
+}
+.navbar .position-relative .badge {
+    top: -10%; 
+    left: 90%; 
+    transform: translate(-50%, -50%); 
+}
+.d-flex {
+    gap: 1rem; 
+}
